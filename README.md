@@ -1,8 +1,34 @@
-# Claude Autonomous Dev Template
+# AI Automated Developer Template
+This is a blank starter project with basic AI tooling setup. Clone this repo and follow the instructions to get started with AI development. This includes:
+- Using autonomous agents safely through remote dev environments
+- Running multiple agents simultaneously
+- Triggering agents to handle tasks
+- Reviewing code automatically
+- Periodic testing and codebase maintenance
 
-A GitHub repository template that wires up Claude as an autonomous development agent. Clone this to get AI-powered issue handling, code review, and self-testing out of the box — without any opinions about your language or framework.
+The goal is to close the loop with AI as much as possible to speed development, while still allowing human intervention to steer the project when needed.
+
+This template is intentionally generic to be a starting point for any project. It provides the basic working tools to get you going, but as your project develops you'll want to customize it to get the most value.
 
 ---
+
+# What it does
+
+The core idea is to use GitHub as a coordination backbone for AIs to work off of. Instead of a single super agent, you can have smaller agents pick up and drop off tasks on a repo, just like a team of people would. This makes reasoning about the automation much simpler, provides clear intervention points, and makes it easy to adjust.
+
+Off this backbone we need the following capabilities to have a full development loop:
+- Isolated environments to pair program with unrestricted AI safely
+- Spawn autonomous agents to go on long running tasks and return with PRs
+- Automatically spawn agents from issues
+- Automatically review PRs and merge trivial ones
+- Automatically create issues from errors and feedback
+- Periodically test the codebase for problems and create issues accordingly
+
+
+
+---
+ # Using it 
+
 
 ## How it works
 
