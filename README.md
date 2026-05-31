@@ -1,196 +1,80 @@
-# AI Automated Developer Template
-This is a blank starter project with basic AI tooling setup. Clone this repo and follow the instructions to get started with AI development. This includes:
-- Using autonomous agents safely through remote dev environments
+# AI Automated Template
+
+This is a blank starter project with basic AI tooling setup. Clone this repo and follow the instructions to get started with AI-enabled development. This includes:
+- Using autonomous agents safely through sandbox environments
 - Running multiple agents simultaneously
-- Triggering agents to handle tasks
-- Reviewing code automatically
+- Automatically triggering agents to handle tasks
+- Assistance in reviewing changes
 - Periodic testing and codebase maintenance
 
-The goal is to close the loop with AI as much as possible to speed development, while still allowing human intervention to steer the project when needed.
+The goal is to close the loop with AI as much as possible to speed development, while still allowing human intervention to steer when needed.
 
-This template is intentionally generic to be a starting point for any project. It provides the basic working tools to get you going, but as your project develops you'll want to customize it to get the most value.
-
----
-
-# What it does
-
-The core idea is to use GitHub as a coordination backbone for AIs to work off of. Instead of a single super agent, you can have smaller agents pick up and drop off tasks on a repo, just like a team of people would. This makes reasoning about the automation much simpler, provides clear intervention points, and makes it easy to adjust.
-
-Off this backbone we need the following capabilities to have a full development loop:
-- Isolated environments to pair program with unrestricted AI safely
-- Spawn autonomous agents to go on long running tasks and return with PRs
-- Automatically spawn agents from issues
-- Automatically review PRs and merge trivial ones
-- Automatically create issues from errors and feedback
-- Periodically test the codebase for problems and create issues accordingly
-
-
-
----
- # Using it 
-
-
-## How it works
-
-This template sets up a layer of automation on top of GitHub using Claude. Once configured, the following happens automatically:
-
-```
-User/Sentry/Tests report a problem
-        ↓
-Issue is created in GitHub
-        ↓
-Analyzer agent triages the issue, adds context, tags implementer
-        ↓
-Implementer agent creates a branch and opens a PR
-        ↓
-Reviewer agent reviews the PR and requests changes or approves
-        ↓
-PR is merged into main (branch protection enforces checks pass first)
-        ↓
-Weekly: Security agent scans the repo and opens issues for findings
-```
-
-All agents are powered by Claude via the Claude GitHub App and GitHub Actions workflows. Agent behavior is controlled by `CLAUDE.md` at the root of the repo.
+This template is intentionally generic. It provides the wiring to get started, but as your project develops you'll want to customize it for your specific needs.
 
 ---
 
-## What's included
+# Strategy
 
-```
-.
-├── .devcontainer/
-│   └── devcontainer.json       # Codespaces config with Claude tooling pre-installed
-├── .github/
-│   └── workflows/
-│       ├── issue-analyzer.yml  # Triages new issues, adds context, tags implementer
-│       ├── issue-implementer.yml # Picks up tagged issues, opens a fix PR
-│       ├── pr-reviewer.yml     # Reviews incoming PRs and leaves feedback
-│       └── weekly-scan.yml     # Runs weekly, opens issues for security findings
-├── .vscode/
-│   └── settings.json           # Recommended VSCode settings for Codespaces
-├── CLAUDE.md                   # Agent instructions and constraints — customize this
-├── Makefile                    # Standard targets your project must implement (see below)
-└── README.md
-```
+The core idea is to use GitHub as a coordination backbone. Instead of a single super-agent, smaller agents pick up and drop off work on a repo, just like a team of people would. This makes the automation easy to reason about, provides visibility into operation, and provides clear intervention points for customization or manual steering.
 
----
+The template is organized around five components:
 
-## Prerequisites
+## Execution Environments
+Isolated, sandboxed environments where AI agents can write and run code safely. Agents need unrestricted access to tools and the filesystem — isolation is what makes that safe.
 
-- A GitHub account with Actions enabled
-- A [Claude GitHub App](https://github.com/apps/claude) installation
-- An Anthropic API key
+## Task Coordination
+GitHub issues and PRs are the interface between humans and agents. Issues define work; PRs deliver it. Every task has a clear paper trail and a natural review point.
 
----
+## Agent Triggers
+Three ways to invoke an agent:
+- **Manual** — a human kicks off an agent directly
+- **Event-driven** — a new issue automatically spawns an agent to handle it
+- **Scheduled** — periodic agents run on a timer (e.g. nightly test runs, maintenance)
 
-## Setup
+## Quality Gates
+Automated checkpoints before work lands: PR review, test runs, and merge criteria. Agents should not be able to merge their own work without passing these gates.
 
-### 1. Create your repo from this template
+## Project Context
+How agents understand the project they're working on — conventions, architecture decisions, coding standards. Without shared context, every agent starts cold and makes inconsistent choices. This is the most project-specific component and the one you'll customize most as your project grows.
 
-Click **Use this template** at the top of this repo, or clone it and push to a new repo.
+## Something about automatic issue creation to close the loop
 
-### 2. Install the Claude GitHub App
+TODO: Describe the overall loop operation
 
-Go to [github.com/apps/claude](https://github.com/apps/claude) and install it on your new repository.
-
-### 3. Add your API key as a secret
-
-In your repo, go to **Settings → Secrets and variables → Actions** and add:
-
-| Secret | Value |
-|---|---|
-| `ANTHROPIC_API_KEY` | Your Anthropic API key |
-
-### 4. Configure branch protection
-
-Go to **Settings → Branches** and add a rule for `main`:
-
-- ✅ Require a pull request before merging
-- ✅ Require status checks to pass before merging
-- ✅ Require approvals: `1`
-- ✅ Dismiss stale pull request approvals when new commits are pushed
-- ✅ Do not allow bypassing the above settings
-
-This ensures agents can never directly push to main.
-
-### 5. Implement the Makefile targets
-
-The workflows invoke standard Makefile targets so they stay stack-agnostic. Implement these in your project's `Makefile`:
-
-```makefile
-# Required
-test:       # Run the full test suite
-lint:       # Run linting / static analysis
-build:      # Build the project (if applicable)
-
-# Optional but recommended
-security:   # Run a security scan (e.g. npm audit, bandit, trivy)
-```
-
-If a target isn't relevant for your project, have it exit 0 silently.
-
-### 6. Customize CLAUDE.md
-
-Open `CLAUDE.md` and update the sections marked `TODO`. At minimum, set:
-
-- What this project does (agents need context to make good decisions)
-- What's in and out of scope for autonomous changes
-- Any directories or files agents should never touch
-- Your preferred branch naming convention
-
-### 7. Enable the weekly scan
-
-Go to **Actions → weekly-scan** and enable the workflow. It's disabled by default so it doesn't run until you're ready.
 
 ---
 
-## Using Codespaces
+# How it works
 
-This template includes a dev container so you can work in a fully configured cloud environment with Claude available via the CLI.
+The template ships with the following files and configurations:
 
-1. Click **Code → Codespaces → Create codespace on main**
-2. Once it loads, Claude Code is available in the terminal: `claude`
-3. Your `ANTHROPIC_API_KEY` secret is automatically available if added to Codespaces secrets under **Settings → Codespaces**
+## GitHub Actions Workflows
+- **`agent-dispatch.yml`** — triggered manually via `workflow_dispatch`. Takes an issue number as input, spins up a Codespace, and runs Claude Code against it.
+- **`agent-trigger.yml`** — triggered when an issue is labeled `agent`. Automatically spins up a Codespace and runs Claude Code against the labeled issue.
+- **`scheduled-tasks.yml`** — runs on a cron schedule. Invokes Claude Code to check for test failures, stale issues, or other maintenance tasks and files issues for anything it finds.
+- **`pr-review.yml`** — triggered on PR open. Runs Claude Code to review the diff and posts findings as PR comments.
+- **`auto-merge.yml`** — triggered when a PR is approved. Auto-merges if all CI checks pass and the PR is labeled `auto-merge`.
 
----
+## Codespace Configuration
+A `.devcontainer/` config that pre-installs Claude Code and the GitHub CLI so agents have everything they need when the environment starts.
 
-## Agent reference
+## CLAUDE.md
+A root-level `CLAUDE.md` that gives agents their baseline instructions — things like branch naming, PR workflow, and how to interact with GitHub. This is the file you'll edit most as your project evolves.
 
-### Issue Analyzer (`issue-analyzer.yml`)
-Triggers on new issues. Claude reads the issue, researches relevant code, and posts a comment with: a summary of the problem, relevant files, and a suggested approach. It then labels the issue `agent-ready` to signal the implementer.
-
-### Issue Implementer (`issue-implementer.yml`)
-Triggers when an issue is labeled `agent-ready`. Claude creates a branch, implements the fix, runs `make test` and `make lint`, and opens a PR linked to the issue.
-
-### PR Reviewer (`pr-reviewer.yml`)
-Triggers on new pull requests. Claude reviews the diff, checks against `CLAUDE.md` constraints, runs any checks it can, and either requests changes or approves. It does not merge — a human approval or a second passing review is required by branch protection.
-
-### Weekly Scanner (`weekly-scan.yml`)
-Runs every Monday at 09:00 UTC. Claude runs `make security` (if defined), reviews dependencies for known issues, and opens labeled issues for anything it finds. Findings are deduplicated so re-runs don't create duplicate issues.
+## Branch Protection
+A GitHub branch protection configuration requiring CI to pass and at least one approval before any PR can merge to `main`.
 
 ---
 
-## Customization
-
-**To change agent behavior** — edit `CLAUDE.md`. This is the primary control surface. Be explicit: vague instructions produce inconsistent behavior.
-
-**To restrict what agents can touch** — add paths to the `off-limits` section of `CLAUDE.md`. Agents will not open PRs that modify those paths.
-
-**To add a new agent** — copy an existing workflow file and update the trigger, prompt, and step logic. Follow the same pattern of running `make test` before opening any PR.
-
-**To connect an error tracker** — add a workflow that listens to your tracker's webhook and creates a GitHub issue in a standard format. The issue analyzer will pick it up from there.
-
+# Setup
 ---
 
-## Security notes
+# Human-in-the-loop
 
-- Agents operate with the permissions of the GitHub App installation — review what access you grant
-- No agent can push directly to `main`; branch protection enforces this independently of agent instructions
-- The `ANTHROPIC_API_KEY` secret is only accessible to workflow runs on your repo — it is not exposed to PRs from forks
-- Review agent-opened PRs before merging; treat them the same as you would a junior developer's output
+Automation handles routine work; humans steer and override. The template is designed with explicit points where human input is expected:
 
----
+- **Issue creation** — humans (or external systems) define what needs to be done
+- **PR review** — non-trivial changes require human approval before merging
+- **Context maintenance** — humans keep the project context accurate, which guides all agent behavior
 
-## Contributing
-
-Issues and PRs welcome. For significant changes, open an issue first to discuss.
+The goal is not to remove humans from the process, but to reserve human attention for decisions that actually need it.
